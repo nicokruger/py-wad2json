@@ -2,6 +2,11 @@ import mapedit
 import wad
 import collections
 
+class WrappedLinedef:
+	def __init__(self, vx_a, vx_b):
+		self.vx_a = vx_a
+		self.vx_b = vx_b
+
 w = wad.WAD("doom.wad")
 e1m1 = w.maps['E1M1']
 
@@ -13,7 +18,14 @@ m = mapedit.MapEditor(e1m1)
 [sectors_sidedefs[sidedef.sector].append((i,sidedef)) for i,sidedef in enumerate(m.sidedefs)]
 
 def find_linedef_from_sidedef(linedefs, sidedef):
-	return [l for l in linedefs if (l.front == sidedef) or (l.back == sidedef)][0]
+	for linedef in linedefs:
+		if linedef.front == sidedef:
+			return linedef;
+		elif linedef.back == sidedef:
+			l = WrappedLinedef(linedef.vx_b, linedef.vx_a)
+			return l
+			
+	#return [l for l in linedefs if (l.front == sidedef) or (l.back == sidedef)][0]
 
 sectors_linedefs = collections.defaultdict(list)
 
@@ -26,11 +38,6 @@ def sigh(l, item):
 		l.index(item)
 	except:
 		return -1
-
-class WrappedLinedef:
-	def __init__(self, vx_a, vx_b):
-		self.vx_a = vx_a
-		self.vx_b = vx_b
 
 def order_linedefs(linedefs):
 	
@@ -72,8 +79,8 @@ def order_linedefs(linedefs):
 
 for sector,linedefs in sectors_linedefs.iteritems():
 	print "SECTOR:", sector
-	#for linedef in order_linedefs(linedefs):
-	for linedef in linedefs:
+	for linedef in order_linedefs(linedefs):
+	#for linedef in linedefs:
 		vx_a = m.vertexes[linedef.vx_a]
 		vx_b = m.vertexes[linedef.vx_b]
 
