@@ -87,3 +87,16 @@ for sector,linedefs in sectors_linedefs.iteritems():
 		print "   LINEDEF: %.2f,%.2f -> %.2f,%.2f" % (vx_a.x, vx_a.y, vx_b.x, vx_b.y)
 
 
+print "----------------------------------------------"
+print " JAVSCRIPT "
+print "----------------------------------------------"
+
+print "var polygons = [];"
+print "var polygon;"
+for sector,linedefs in sectors_linedefs.iteritems():
+	print "polygon = $P(",
+
+	print ",".join(["$V(%.2f,%.2f)" % (m.vertexes[l.vx_a].x/5.0 + 100, m.vertexes[l.vx_a].y/5.0 + 1200) for l in order_linedefs(linedefs)]),
+	#print ", $V($.2f,%.2f)" % (m.vertexes[order_linedefs(linedefs)[-1].vx_b].x, m.vertexes[order_linedefs(linedefs)[-1].vx_b].y),
+	print ");"
+	print "polygons.push(polygon);"
