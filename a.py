@@ -88,15 +88,19 @@ for sector,linedefs in sectors_linedefs.iteritems():
 
 
 print "----------------------------------------------"
-print " JAVSCRIPT "
+print " JSON "
 print "----------------------------------------------"
 
-print "var polygons = [];"
-print "var polygon;"
+json = '{ "zones": ['
+polygons = []
 for sector,linedefs in sectors_linedefs.iteritems():
-	print "polygon = $P(",
+	points =  ",".join(["[%.2f,%.2f]" % (m.vertexes[l.vx_a].x/4.0 + 100, m.vertexes[l.vx_a].y/4.0 + 1200) for l in order_linedefs(linedefs)]),
+	polygons.append(points)
 
-	print ",".join(["$V(%.2f,%.2f)" % (m.vertexes[l.vx_a].x/5.0 + 100, m.vertexes[l.vx_a].y/5.0 + 1200) for l in order_linedefs(linedefs)]),
+json += ",".join([' {"points" : [%s], "pops" : [0], "texture" : "name"}' % (p) for p in polygons])
+
 	#print ", $V($.2f,%.2f)" % (m.vertexes[order_linedefs(linedefs)[-1].vx_b].x, m.vertexes[order_linedefs(linedefs)[-1].vx_b].y),
-	print ");"
-	print "polygons.push(polygon);"
+json += "]}"
+print json
+
+
