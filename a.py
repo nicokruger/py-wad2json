@@ -36,8 +36,6 @@ def find_linedef_from_sidedef(linedefs, sidedef):
 
 sectors_linedefs = collections.defaultdict(list)
 
-#[sectors_linedefs[sector].append(find_linedef_from_sidedef(m.linedefs, sidedef[0])) for sidedef in sectors_sidedefs[sector] for sector in sectors_sidedefs.keys()]
-
 [sectors_linedefs[sector].append(find_linedef_from_sidedef(m.linedefs, sidedef[0])) for sector in sectors_sidedefs.keys() for sidedef in sectors_sidedefs[sector]]
 
 def sigh(l, item):
@@ -84,6 +82,16 @@ def order_linedefs(linedefs):
 
 	return new_edges
 
+def reverse_linedefs(linedefs):
+	linedefscopy = list(linedefs)
+	linedefscopy.reverse()
+
+	reversed_linedefs = []
+	for linedef in linedefscopy:
+		l = WrappedLinedef(linedef.vx_b, linedef.vx_a)
+		reversed_linedefs.append(l)
+	return reversed_linedefs
+
 for sector,linedefs in sectors_linedefs.iteritems():
 	print "SECTOR:", sector
 	for linedef in order_linedefs(linedefs):
@@ -105,10 +113,10 @@ print "----------------------------------------------"
 json = '{ "zones": ['
 polygons = []
 for sector,linedefs in sectors_linedefs.iteritems():
-	points =  ",".join(["[%.2f,%.2f]" % (scalex(m.vertexes[l.vx_a].x), scaley(m.vertexes[l.vx_a].y)) for l in order_linedefs(linedefs)]),
+	points =  ",".join(["[%.2f,%.2f]" % (scalex(m.vertexes[l.vx_a].x), scaley(m.vertexes[l.vx_a].y)) for l in reverse_linedefs(order_linedefs(linedefs))]),
 	polygons.append(points)
 
-json += ",".join([' {"points" : [%s], "pops" : [0], "texture" : "name", "label":"%s" }' % (p[0],"polygon"+str(i)) for i,p in enumerate(polygons[:5])])
+json += ",".join([' {"points" : [%s], "pops" : [0], "texture" : "name", "label":"%s" }' % (p[0],"polygon"+str(i)) for i,p in enumerate(polygons[:1])])
 
 	#print ", $V($.2f,%.2f)" % (m.vertexes[order_linedefs(linedefs)[-1].vx_b].x, m.vertexes[order_linedefs(linedefs)[-1].vx_b].y),
 json += "]}"
