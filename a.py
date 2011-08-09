@@ -93,6 +93,10 @@ for sector,linedefs in sectors_linedefs.iteritems():
 
 		print "   LINEDEF: %.2f,%.2f -> %.2f,%.2f" % (vx_a.x, vx_a.y, vx_b.x, vx_b.y)
 
+def scalex(x):
+	return x/2.0 - 300
+def scaley(y):
+	return y/2.0 + 2000
 
 print "----------------------------------------------"
 print " JSON "
@@ -101,10 +105,10 @@ print "----------------------------------------------"
 json = '{ "zones": ['
 polygons = []
 for sector,linedefs in sectors_linedefs.iteritems():
-	points =  ",".join(["[%.2f,%.2f]" % (m.vertexes[l.vx_a].x/4.0 + 100, m.vertexes[l.vx_a].y/4.0 + 1200) for l in order_linedefs(linedefs)]),
+	points =  ",".join(["[%.2f,%.2f]" % (scalex(m.vertexes[l.vx_a].x), scaley(m.vertexes[l.vx_a].y)) for l in order_linedefs(linedefs)]),
 	polygons.append(points)
 
-json += ",".join([' {"points" : [%s], "pops" : [0], "texture" : "name", "label":"a" }' % (p) for p in polygons[:1]])
+json += ",".join([' {"points" : [%s], "pops" : [0], "texture" : "name", "label":"%s" }' % (p[0],"polygon"+str(i)) for i,p in enumerate(polygons[:5])])
 
 	#print ", $V($.2f,%.2f)" % (m.vertexes[order_linedefs(linedefs)[-1].vx_b].x, m.vertexes[order_linedefs(linedefs)[-1].vx_b].y),
 json += "]}"
