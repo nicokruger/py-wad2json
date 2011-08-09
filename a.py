@@ -1,6 +1,13 @@
 import mapedit
 import wad
 import collections
+import sys
+
+if len(sys.argv) != 2:
+	print "enter filename"
+	sys.exit(1)
+
+outfile = sys.argv[1]
 
 class WrappedLinedef:
 	def __init__(self, vx_a, vx_b):
@@ -97,10 +104,10 @@ for sector,linedefs in sectors_linedefs.iteritems():
 	points =  ",".join(["[%.2f,%.2f]" % (m.vertexes[l.vx_a].x/4.0 + 100, m.vertexes[l.vx_a].y/4.0 + 1200) for l in order_linedefs(linedefs)]),
 	polygons.append(points)
 
-json += ",".join([' {"points" : [%s], "pops" : [0], "texture" : "name"}' % (p) for p in polygons])
+json += ",".join([' {"points" : [%s], "pops" : [0], "texture" : "name", "label":"a" }' % (p) for p in polygons[:1]])
 
 	#print ", $V($.2f,%.2f)" % (m.vertexes[order_linedefs(linedefs)[-1].vx_b].x, m.vertexes[order_linedefs(linedefs)[-1].vx_b].y),
 json += "]}"
 print json
 
-
+open(outfile,"w").write(json)
