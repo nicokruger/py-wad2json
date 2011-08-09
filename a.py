@@ -16,13 +16,13 @@ class WrappedLinedef:
 
 w = wad.WAD("doom.wad")
 e1m1 = w.maps['E1M1']
-
+m = mapedit.MapEditor(e1m1)
 
 sectors_sidedefs = collections.defaultdict(list)
 
-m = mapedit.MapEditor(e1m1)
+for i,sidedef in enumerate(m.sidedefs):
+	sectors_sidedefs[sidedef.sector].append((i,sidedef))
 
-[sectors_sidedefs[sidedef.sector].append((i,sidedef)) for i,sidedef in enumerate(m.sidedefs)]
 
 def find_linedef_from_sidedef(linedefs, sidedef):
 	for linedef in linedefs:
@@ -36,7 +36,9 @@ def find_linedef_from_sidedef(linedefs, sidedef):
 
 sectors_linedefs = collections.defaultdict(list)
 
-[sectors_linedefs[sector].append(find_linedef_from_sidedef(m.linedefs, sidedef[0])) for sector in sectors_sidedefs.keys() for sidedef in sectors_sidedefs[sector]]
+for sector,sidedefs in sectors_sidedefs.iteritems():
+	for sidedef in sidedefs:
+		sectors_linedefs[sector].append(find_linedef_from_sidedef(m.linedefs, sidedef[0]))
 
 def sigh(l, item):
 	try:
@@ -116,7 +118,7 @@ for sector,linedefs in sectors_linedefs.iteritems():
 	points =  ",".join(["[%.2f,%.2f]" % (scalex(m.vertexes[l.vx_a].x), scaley(m.vertexes[l.vx_a].y)) for l in reverse_linedefs(order_linedefs(linedefs))]),
 	polygons.append(points)
 
-json += ",".join([' {"points" : [%s], "pops" : [0], "texture" : "name", "label":"%s" }' % (p[0],"polygon"+str(i)) for i,p in enumerate(polygons[:1])])
+json += ",".join([' {"points" : [%s], "pops" : [0], "texture" : "name", "label":"%s" }' % (p[0],"polygon"+str(i)) for i,p in enumerate(polygons[:10])])
 
 	#print ", $V($.2f,%.2f)" % (m.vertexes[order_linedefs(linedefs)[-1].vx_b].x, m.vertexes[order_linedefs(linedefs)[-1].vx_b].y),
 json += "]}"
