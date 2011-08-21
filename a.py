@@ -4,6 +4,8 @@ import collections
 import sys
 from StringIO import StringIO
 import json
+import base64
+import os.path
 
 if len(sys.argv) != 2:
 	print "enter filename"
@@ -16,26 +18,42 @@ class WrappedLinedef:
 		self.vx_a = vx_a
 		self.vx_b = vx_b
 
-def Map(sectors,textures):
-	return { "sectors" : sectors, "textures" : textures }
+class TextureReader:
+	def __init__(self, basepath):
+		self.basepath = basepath
+	
+	def getdata(self, texturename):
+		print texturename
+		texturedata = base64.b64encode(open(os.path.join(self.basepath, texturename + ".png"), "r").read())
+		if texturename == "floor4_8":
+			print texturedata
+		return "data:image/png;base64," + texturedata
+
+def Map(sectors,texturedata):
+	return { "sectors" : sectors, "texturedata" : texturedata }
 
 class DoomExporter:
-	def __init__(self,wadfile,mapname, outfile):
+	def __init__(self,wadfile,mapname,texturereader):
 		self.w = wad.WAD(wadfile)
 		self.mapentry = self.w.maps[mapname]
+		self.texturereader = texturereader
 
 		self.m = mapedit.MapEditor(self.mapentry)
 		
-		self.export(outfile)
+		self.export()
 
 	def scalex(self,x):
 		return x + 800
 	def scaley(self,y):
 		return y + 4500
 
-	def export(self, outfile):
+	def export(self):
 		
 		textures = self.__gettextures(self.m)
+		texturedata = {}
+		for texturename in set(textures.values()):
+			texturedata[texturename] = self.texturereader.getdata(texturename)
+
 		sectors_linedefs = self.__getlinedefs_per_sector(self.m, self.__getsidedefs_per_sector(self.m))
 
 		for sector,linedefs in sectors_linedefs.iteritems():
@@ -44,8 +62,6 @@ class DoomExporter:
 				vx_b = self.m.vertexes[linedef.vx_b]
 
 				print "   LINEDEF: %.2f,%.2f -> %.2f,%.2f" % (vx_a.x, vx_a.y, vx_b.x, vx_b.y)
-
-		self.textures = set(textures.values())	
 
 		self.json = '{ "sectors": ['
 		sectors = []
@@ -56,9 +72,9 @@ class DoomExporter:
 			label = "polygon" + str(sector)
 
 			sectors.append({ "points" : points, "texture" : texture, "label" : label })
-		
+	
 		out = StringIO()
-		json.dump(Map(sectors,textures), out)
+		json.dump(Map(sectors, texturedata), out)
 		self.json = out.getvalue()
 
 		#self.json += ",".join([' {"points" : [%s], "texture" : "%s", "label":"%s" }' % (p[0][0],p[1],"polygon"+str(i)) for i,p in enumerate(polygons)])
@@ -148,7 +164,7 @@ def ReverseLinedefs(linedefs):
 	return reversed_linedefs
 
 if __name__ == "__main__":
-	de = DoomExporter("doom.wad", "E1M1", outfile)
+	de = DoomExporter("doom.wad", "E1M1", TextureReader("/home/nico.kruger/Downloads/doom-hires/basev/doom/hirestex/flats"))
 
 	
 	print "----------------------------------------------"
@@ -157,9 +173,4 @@ if __name__ == "__main__":
 	print de.json
 	open(outfile,"w").write(de.json)
 
-	print "--------"
-	print "Textures"
-	print "--------"
-	print de.textures
 
-	print de.textures
