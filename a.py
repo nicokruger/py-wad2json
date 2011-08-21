@@ -29,8 +29,8 @@ class TextureReader:
 			print texturedata
 		return "data:image/png;base64," + texturedata
 
-def Map(sectors,texturedata):
-	return { "sectors" : sectors, "texturedata" : texturedata }
+def Map(sectors,texturedata, player1):
+	return { "sectors" : sectors, "texturedata" : texturedata, "player1" : player1 }
 
 class DoomExporter:
 	def __init__(self,wadfile,mapname,texturereader):
@@ -49,6 +49,9 @@ class DoomExporter:
 
 	def export(self):
 		
+		player1 = self.__find_player_start(self.m, 1)
+		player1 = [self.scalex(player1[0]), self.scaley(player1[1])]
+
 		textures = self.__gettextures(self.m)
 		texturedata = {}
 		for texturename in set(textures.values()):
@@ -74,7 +77,7 @@ class DoomExporter:
 			sectors.append({ "points" : points, "texture" : texture, "label" : label })
 	
 		out = StringIO()
-		json.dump(Map(sectors, texturedata), out)
+		json.dump(Map(sectors, texturedata, player1), out)
 		self.json = out.getvalue()
 
 		#self.json += ",".join([' {"points" : [%s], "texture" : "%s", "label":"%s" }' % (p[0][0],p[1],"polygon"+str(i)) for i,p in enumerate(polygons)])
@@ -115,6 +118,11 @@ class DoomExporter:
 			elif linedef.back == sidedef:
 				l = WrappedLinedef(linedef.vx_b, linedef.vx_a)
 				return l
+
+	def __find_player_start(self, m, player):
+		for thing in m.things:
+			if thing.type == player:
+				return [thing.x,thing.y]
 
 def LinedefOrder(linedefs):
 	
