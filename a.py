@@ -2,6 +2,8 @@ import mapedit
 import wad
 import collections
 import sys
+from StringIO import StringIO
+import json
 
 if len(sys.argv) != 2:
 	print "enter filename"
@@ -13,6 +15,9 @@ class WrappedLinedef:
 	def __init__(self, vx_a, vx_b):
 		self.vx_a = vx_a
 		self.vx_b = vx_b
+
+def Map(sectors,textures):
+	return { "sectors" : sectors, "textures" : textures }
 
 class DoomExporter:
 	def __init__(self,wadfile,mapname, outfile):
@@ -29,7 +34,10 @@ class DoomExporter:
 		return y + 4500
 
 	def export(self, outfile):
-		textures,sectors_linedefs = self.__getlinedefs_per_sector(self.m, self.__getsidedefs_per_sector(self.m))
+		
+		textures = self.__gettextures(self.m)
+		sectors_linedefs = self.__getlinedefs_per_sector(self.m, self.__getsidedefs_per_sector(self.m))
+
 		for sector,linedefs in sectors_linedefs.iteritems():
 			for linedef in LinedefOrder(linedefs):
 				vx_a = self.m.vertexes[linedef.vx_a]
@@ -40,13 +48,21 @@ class DoomExporter:
 		self.textures = set(textures.values())	
 
 		self.json = '{ "sectors": ['
-		polygons = []
+		sectors = []
 		for sector,linedefs in sectors_linedefs.iteritems():
 			linedefs = sectors_linedefs[sector]
-			points =  ",".join(["[%.2f,%.2f]" % (self.scalex(self.m.vertexes[l.vx_a].x), self.scaley(self.m.vertexes[l.vx_a].y)) for l in ReverseLinedefs(LinedefOrder(linedefs))]),
-			polygons.append([points,textures[sector]])
-		self.json += ",".join([' {"points" : [%s], "texture" : "%s", "label":"%s" }' % (p[0][0],p[1],"polygon"+str(i)) for i,p in enumerate(polygons)])
-		self.json += "]}"
+			points =  [(self.scalex(self.m.vertexes[l.vx_a].x), self.scaley(self.m.vertexes[l.vx_a].y)) for l in ReverseLinedefs(LinedefOrder(linedefs))]
+			texture = textures[sector]
+			label = "polygon" + str(sector)
+
+			sectors.append({ "points" : points, "texture" : texture, "label" : label })
+		
+		out = StringIO()
+		json.dump(Map(sectors,textures), out)
+		self.json = out.getvalue()
+
+		#self.json += ",".join([' {"points" : [%s], "texture" : "%s", "label":"%s" }' % (p[0][0],p[1],"polygon"+str(i)) for i,p in enumerate(polygons)])
+		#self.json += "]}"
 
 
 
@@ -60,15 +76,21 @@ class DoomExporter:
 		return sectors_sidedefs
 
 	def __getlinedefs_per_sector(self, m, sectors_sidedefs):
-		textures = {}
 		sectors_linedefs = collections.defaultdict(list)
 		for sector,sidedefs in sectors_sidedefs.iteritems():
 			sidedefs = sectors_sidedefs[sector]
-			textures[sector] = m.sectors[sector].tx_floor.lower()
 			for sidedef in sidedefs:
 				sectors_linedefs[sector].append(self.__find_linedef_from_sidedef(m.linedefs, sidedef[0]))
 		
-		return textures,sectors_linedefs
+		return sectors_linedefs
+
+	def __gettextures(self, m):
+		textures = {}
+
+		for i,sector in enumerate(m.sectors):
+			textures[i] = sector.tx_floor.lower()
+
+		return textures
 
 	def __find_linedef_from_sidedef(self, linedefs, sidedef):
 		for linedef in linedefs:
