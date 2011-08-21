@@ -7,11 +7,11 @@ import json
 import base64
 import os.path
 
-if len(sys.argv) != 2:
-	print "enter filename"
+if len(sys.argv) != 4:
+	print "enter filename, iwad, mapname"
 	sys.exit(1)
 
-outfile = sys.argv[1]
+outfile,iwad,mapname = sys.argv[1:]
 
 class WrappedLinedef:
 	def __init__(self, vx_a, vx_b):
@@ -172,7 +172,7 @@ def ReverseLinedefs(linedefs):
 	return reversed_linedefs
 
 if __name__ == "__main__":
-	de = DoomExporter("doom.wad", "E1M1", TextureReader("/home/nico.kruger/Downloads/doom-hires/basev/doom/hirestex/flats"))
+	de = DoomExporter(iwad, mapname, TextureReader("/home/nico.kruger/Downloads/jsdoom"))
 
 	
 	print "----------------------------------------------"
