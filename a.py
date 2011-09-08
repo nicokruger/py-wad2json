@@ -43,9 +43,9 @@ class DoomExporter:
 		self.export()
 
 	def scalex(self,x):
-		return x + 800
+		return x
 	def scaley(self,y):
-		return y + 4500
+		return y
 
 	def export(self):
 		
