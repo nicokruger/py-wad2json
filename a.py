@@ -94,7 +94,9 @@ class DoomExporter:
 		for sector,sidedefs in sectors_sidedefs.iteritems():
 			sidedefs = sectors_sidedefs[sector]
 			for sidedef in sidedefs:
-				sectors_linedefs[sector].append(self.__find_linedef_from_sidedef(m.linedefs, sidedef[0]))
+				ldef = self.__find_linedef_from_sidedef(m.linedefs, sidedef[0])
+				if ldef is not None:
+					sectors_linedefs[sector].append(ldef)
 		
 		return sectors_linedefs
 
@@ -128,6 +130,7 @@ def LinedefOrder(linedefs):
 	edge_links_backward = {}
 
 	vertices = [];
+	print linedefs
 	for l in linedefs:
 		edge_links_forward[l.vx_a] = l.vx_b
 		edge_links_backward[l.vx_b] = l.vx_a
@@ -203,6 +206,8 @@ class TextureReader:
 
 def Map(sectors,texturedata, player1, extents):
 	return { "sectors" : sectors, "texturedata" : texturedata, "player1" : player1, "extents":extents }
+
+    
 if __name__ == "__main__":
 	de = DoomExporter(iwad, mapname, TextureReader("/home/nico.kruger/Downloads/jsdoom"))
 
