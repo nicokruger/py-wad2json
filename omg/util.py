@@ -262,7 +262,7 @@ def _structdef(name, doc, fields, flags=None, init_exec=""):
     extra  = [f for f in fields if f[1] == 'x']
     fields = [f for f in fields if f[1] != 'x']
 
-    fmt = "".join(f[1] for f in fields)
+    fmt = "=" + "".join(f[1] for f in fields)
     fmtsize = calcsize(fmt)
 
     # properties for easy access to the 'flags' bit field
