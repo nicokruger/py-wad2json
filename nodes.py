@@ -63,7 +63,6 @@ class GlNodeParser:
         #    sys.exit(1)
         #self.vertex_index = 2
 
-        print self.vertex_data[self.vertex_index:], len(self.vertex_data[self.vertex_index:])
         self.vertices = [self._get_vertex() for i in range(len(self.vertex_data[self.vertex_index:]) / (2 * 2))]
 
         self.gl_vertex_offset = len(map.vertexes)
@@ -73,10 +72,6 @@ class GlNodeParser:
 
         self.segs = [self._get_seg() for i in range(len(self.segs_data) / (2 * 5))]
         self.ssectors = [self._get_ssector() for i in range(len(self.ssect_data) / (2 * 2))]
-
-        print " ".join([str(v) for v in self.vertices])
-        print " ".join([str(s) for s in self.segs])
-        print " ".join([str(s) for s in self.ssectors])
 
         map.segs = self.segs
         map.ssectors = self.ssectors
@@ -112,7 +107,6 @@ class GlNodeParser:
         count, first_seg = struct.unpack("=HH", self.ssect_data[self.ssect_index:self.ssect_index + 2 * 2])
         self.ssect_index += 2 * 2
         ssector = collections.namedtuple("ssector", ["numsegs", "seg_a"])
-        print "WTF", first_seg
         ssector.numsegs = count
         ssector.seg_a = first_seg
         return ssector

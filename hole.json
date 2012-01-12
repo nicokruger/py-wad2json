@@ -1,22 +1,4 @@
 {
-    "doom_ssectors": [
-        {
-            "numsegs": 4, 
-            "seg_a": 0
-        }, 
-        {
-            "numsegs": 5, 
-            "seg_a": 4
-        }, 
-        {
-            "numsegs": 5, 
-            "seg_a": 9
-        }, 
-        {
-            "numsegs": 6, 
-            "seg_a": 14
-        }
-    ], 
     "extents": {
         "x1": -768, 
         "x2": -256, 
@@ -144,11 +126,15 @@
     "sectors": [
         {
             "light": 144, 
+            "tx_ceil": "CEIL3_5", 
+            "tx_floor": "FLOOR4_8", 
             "z_ceil": 128, 
             "z_floor": 0
         }, 
         {
             "light": 144, 
+            "tx_ceil": "CEIL3_5", 
+            "tx_floor": "FLOOR4_8", 
             "z_ceil": 128, 
             "z_floor": 0
         }
@@ -303,147 +289,22 @@
     ], 
     "ssectors": [
         {
-            "sector": 0, 
-            "segs": [
-                {
-                    "line": 5, 
-                    "side": 0, 
-                    "vx_a": 6, 
-                    "vx_b": 5
-                }, 
-                {
-                    "line": 65535, 
-                    "side": 0, 
-                    "vx_a": 5, 
-                    "vx_b": 13
-                }, 
-                {
-                    "line": 1, 
-                    "side": 0, 
-                    "vx_a": 13, 
-                    "vx_b": 15
-                }, 
-                {
-                    "line": 65535, 
-                    "side": 0, 
-                    "vx_a": 15, 
-                    "vx_b": 6
-                }
-            ]
+            "numsegs": 4, 
+            "seg_a": 0
         }, 
         {
-            "sector": 0, 
-            "segs": [
-                {
-                    "line": 2, 
-                    "side": 0, 
-                    "vx_a": 1, 
-                    "vx_b": 14
-                }, 
-                {
-                    "line": 65535, 
-                    "side": 0, 
-                    "vx_a": 14, 
-                    "vx_b": 7
-                }, 
-                {
-                    "line": 4, 
-                    "side": 0, 
-                    "vx_a": 7, 
-                    "vx_b": 6
-                }, 
-                {
-                    "line": 65535, 
-                    "side": 0, 
-                    "vx_a": 6, 
-                    "vx_b": 15
-                }, 
-                {
-                    "line": 1, 
-                    "side": 0, 
-                    "vx_a": 15, 
-                    "vx_b": 1
-                }
-            ]
+            "numsegs": 5, 
+            "seg_a": 4
         }, 
         {
-            "sector": 0, 
-            "segs": [
-                {
-                    "line": 2, 
-                    "side": 0, 
-                    "vx_a": 14, 
-                    "vx_b": 0
-                }, 
-                {
-                    "line": 3, 
-                    "side": 0, 
-                    "vx_a": 0, 
-                    "vx_b": 12
-                }, 
-                {
-                    "line": 65535, 
-                    "side": 0, 
-                    "vx_a": 12, 
-                    "vx_b": 4
-                }, 
-                {
-                    "line": 7, 
-                    "side": 0, 
-                    "vx_a": 4, 
-                    "vx_b": 7
-                }, 
-                {
-                    "line": 65535, 
-                    "side": 0, 
-                    "vx_a": 7, 
-                    "vx_b": 14
-                }
-            ]
+            "numsegs": 5, 
+            "seg_a": 9
         }, 
         {
-            "sector": 0, 
-            "segs": [
-                {
-                    "line": 6, 
-                    "side": 0, 
-                    "vx_a": 5, 
-                    "vx_b": 4
-                }, 
-                {
-                    "line": 65535, 
-                    "side": 0, 
-                    "vx_a": 4, 
-                    "vx_b": 12
-                }, 
-                {
-                    "line": 3, 
-                    "side": 0, 
-                    "vx_a": 12, 
-                    "vx_b": 3
-                }, 
-                {
-                    "line": 0, 
-                    "side": 0, 
-                    "vx_a": 3, 
-                    "vx_b": 2
-                }, 
-                {
-                    "line": 1, 
-                    "side": 0, 
-                    "vx_a": 2, 
-                    "vx_b": 13
-                }, 
-                {
-                    "line": 65535, 
-                    "side": 0, 
-                    "vx_a": 13, 
-                    "vx_b": 5
-                }
-            ]
+            "numsegs": 6, 
+            "seg_a": 14
         }
     ], 
-    "texturedata": [], 
     "vertices": [
         {
             "x": -768, 

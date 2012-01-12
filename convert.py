@@ -46,42 +46,25 @@ class DoomExporter:
             "vertices" : list(self.vertices),
             "sidedefs" : self.sidedefs,
             "linedefs" : self.linedefs,
-            "ssectors" : self.ssectors,
             "segs" : self.segs,
-            "doom_ssectors" : self.doom_ssectors,
-            "texturedata" : [], #self.texturedata, 
+            "ssectors" : self.ssectors,
             "player1" : player1, 
             "extents":self.extents
         }
         map["nodes"] = self.nodes
         
-        print json.dumps(map, sort_keys=True, indent=4)
         self.json = json.dumps(map, sort_keys=True, indent=4)
 
     def export(self):
 
         self.textures = self.__gettextures(self.m)
 
-        self.sectors = [{"z_ceil": s.z_ceil, "z_floor":s.z_floor, "light":s.light} for s in self.m.sectors]
+        self.sectors = [{"tx_ceil": s.tx_ceil, "tx_floor": s.tx_floor, "z_ceil": s.z_ceil, "z_floor":s.z_floor, "light":s.light} for s in self.m.sectors]
         self.linedefs = [{"vx_a" : l.vx_a, "vx_b" : l.vx_b, "right":l.front, "left":l.back} for l in self.m.linedefs]
         self.vertices = [{"x":v.x, "y":v.y} for v in self.m.vertexes]
         self.sidedefs = [{"sector":s.sector} for s in self.m.sidedefs]
         self.segs = 	[{"vx_a":seg.vx_a,"vx_b":seg.vx_b,"line":seg.line,"side":seg.side} for seg in self.m.segs]
-        self.doom_ssectors = [{"seg_a":ssector.seg_a,"numsegs":ssector.numsegs} for ssector in self.m.ssectors]
-        
-        self.ssector_to_sector = [self.get_seg_sector(self.m.segs[ssector.seg_a:ssector.seg_a+ssector.numsegs]) for ssector in self.m.ssectors]
-        self.ssectors = []
-        for i,ssector in enumerate(self.m.ssectors):
-            s = {}
-            s["segs"] = [{"vx_a":seg.vx_a, "vx_b":seg.vx_b,"line":seg.line,"side":seg.side} for seg in self.m.segs[ssector.seg_a:ssector.seg_a+ssector.numsegs]]
-            s["sector"] = self.ssector_to_sector[i]
-            self.ssectors.append(s)
-        
-        self.texturedata = {}
-        for texturename in set(self.textures.values()):
-            print "TEX---",texturename
-            self.texturedata[texturename] = self.texturereader.getdata(texturename)
-    
+        self.ssectors = [{"seg_a":ssector.seg_a,"numsegs":ssector.numsegs} for ssector in self.m.ssectors]
         self.extents = {
             "x1":min([v.x for v in self.m.vertexes]), 
             "x2":max([v.x for v in self.m.vertexes]), 
@@ -89,13 +72,10 @@ class DoomExporter:
             "y2":max([v.y for v in self.m.vertexes]),
         }
 
-        #out = StringIO()
-        print "extents",self.extents
         
 
     def _a(self, line,side): # python2 lambdas are really restrictive, so have to have this function
         if side == 0:
-            print line
             return self.m.sidedefs[self.m.linedefs[line].front].sector 
         elif side == 1:
             return self.m.sidedefs[self.m.linedefs[line].back].sector
