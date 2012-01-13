@@ -2,7 +2,6 @@ import mapedit
 import wad
 import collections
 import sys
-from StringIO import StringIO
 import json
 import base64
 import os.path
@@ -13,12 +12,12 @@ if len(sys.argv) != 4:
     print "enter filename, iwad, mapname"
     sys.exit(1)
 
-outfile,iwad,mapname = sys.argv[1:]
+outfile, iwad, mapname = sys.argv[1:]
 
 
 class DoomExporter:
-    def __init__(self,wadfile,mapname,texturereader):
-        print "wadfile",wadfile
+    def __init__(self, wadfile, mapname, texturereader):
+        print "wadfile", wadfile
         self.w = wad.WAD(wadfile)
         self.mapentry = self.w.maps[mapname]
         self.texturereader = texturereader
@@ -32,7 +31,7 @@ class DoomExporter:
         self.m.sidedefs = m.sidedefs
         self.m.vertexes = m.vertexes
         self.m.things = m.things
-        
+
         self.nodes = nodes.nodes(wadfile, mapname, self.m)
         #self.nodes = None
         self.export()
@@ -40,19 +39,19 @@ class DoomExporter:
         for thing in self.m.things:
             if thing.type == 1:
                 player1 = [thing.x, thing.y]
-        
+
         map = {
-            "sectors" : self.sectors, 
-            "vertices" : list(self.vertices),
-            "sidedefs" : self.sidedefs,
-            "linedefs" : self.linedefs,
-            "segs" : self.segs,
-            "ssectors" : self.ssectors,
-            "player1" : player1, 
-            "extents":self.extents
+            "sectors": self.sectors,
+            "vertices": list(self.vertices),
+            "sidedefs": self.sidedefs,
+            "linedefs": self.linedefs,
+            "segs": self.segs,
+            "ssectors": self.ssectors,
+            "player1": player1,
+            "extents": self.extents
         }
         map["nodes"] = self.nodes
-        
+
         self.json = json.dumps(map, sort_keys=True, indent=4)
 
     def export(self):
@@ -60,35 +59,33 @@ class DoomExporter:
         self.textures = self.__gettextures(self.m)
 
         self.sectors = [{"tx_ceil": s.tx_ceil, "tx_floor": s.tx_floor, "z_ceil": s.z_ceil, "z_floor":s.z_floor, "light":s.light} for s in self.m.sectors]
-        self.linedefs = [{"vx_a" : l.vx_a, "vx_b" : l.vx_b, "right":l.front, "left":l.back} for l in self.m.linedefs]
+        self.linedefs = [{"vx_a": l.vx_a, "vx_b": l.vx_b, "right": l.front, "left": l.back} for l in self.m.linedefs]
         self.vertices = [{"x":v.x, "y":v.y} for v in self.m.vertexes]
         self.sidedefs = [{"sector":s.sector} for s in self.m.sidedefs]
-        self.segs = 	[{"vx_a":seg.vx_a,"vx_b":seg.vx_b,"line":seg.line,"side":seg.side} for seg in self.m.segs]
-        self.ssectors = [{"seg_a":ssector.seg_a,"numsegs":ssector.numsegs} for ssector in self.m.ssectors]
+        self.segs = [{"vx_a": seg.vx_a, "vx_b": seg.vx_b, "line": seg.line, "side": seg.side} for seg in self.m.segs]
+        self.ssectors = [{"seg_a": ssector.seg_a, "numsegs":ssector.numsegs} for ssector in self.m.ssectors]
         self.extents = {
-            "x1":min([v.x for v in self.m.vertexes]), 
-            "x2":max([v.x for v in self.m.vertexes]), 
-            "y1":min([v.y for v in self.m.vertexes]),
-            "y2":max([v.y for v in self.m.vertexes]),
+            "x1": min([v.x for v in self.m.vertexes]),
+            "x2": max([v.x for v in self.m.vertexes]),
+            "y1": min([v.y for v in self.m.vertexes]),
+            "y2": max([v.y for v in self.m.vertexes]),
         }
 
-        
-
-    def _a(self, line,side): # python2 lambdas are really restrictive, so have to have this function
+    def _a(self, line, side):  # python2 lambdas are really restrictive, so have to have this function
         if side == 0:
-            return self.m.sidedefs[self.m.linedefs[line].front].sector 
+            return self.m.sidedefs[self.m.linedefs[line].front].sector
         elif side == 1:
             return self.m.sidedefs[self.m.linedefs[line].back].sector
         raise "what does side %i mean?" % side
-        
-    def get_seg_sector(self,segs):
+
+    def get_seg_sector(self, segs):
         # find the first one that is not 65536 - special glbsp node
         for s in segs:
             if s != 65535:
-                return self._a(s.line,s.side)
+                return self._a(s.line, s.side)
 
         raise "seg doesn't have a sector!"
-        
+
     def __gettextures(self, m):
         textures = {}
 
@@ -96,11 +93,9 @@ class DoomExporter:
         for sector in m.sectors:
             for texture in texture_finder(sector.tx_floor.lower()):
                 textures[a] = texture
-                a+=1
+                a += 1
 
         return textures
-
-
 
 
 class WrappedLinedef:
@@ -108,10 +103,11 @@ class WrappedLinedef:
         self.vx_a = vx_a
         self.vx_b = vx_b
 
+
 def texture_finder(texture):
     animated_textures = [
         ["NUKAGE1", "NUKAGE2", "NUKAGE3"],
-        ["FWATER1", "FWATER2", "FWATER3","FWATER4"],
+        ["FWATER1", "FWATER2", "FWATER3", "FWATER4"],
         ["SWATER1", "SWATER2", "SWATER3", "SWATER4"],
         ["LAVA1", "LAVA2", "LAVA3", "LAVA4"],
         ["BLOOD1", "BLOOD2", "BLOOD3"],
@@ -124,35 +120,34 @@ def texture_finder(texture):
         return [x.lower() for x in filter(lambda x: texture.upper() in x, animated_textures)[0]]
     except IndexError:
         return [texture]
-    
 
 
 class TextureReader:
     def __init__(self, basepath):
         self.basepath = basepath
-    
+
     def getdata(self, texturename):
         texturedata = base64.b64encode(open(os.path.join(self.basepath, texturename + ".png"), "r").read())
         return "data:image/png;base64," + texturedata
 
+
 def Map(texturedata, player1, extents, sectors, vertexes, linedefs, sidedefs, ssectors):
-    return { 
-        "sectors" : sectors, 
-        "vertexes" : vertexes,
-        "sidedefs" : sidedefs,
-        "linedefs" : linedefs,
-        "ssectors" : ssectors,
-        "texturedata" : texturedata, 
-        "player1" : player1, 
-        "extents":extents 
+    return {
+        "sectors": sectors,
+        "vertexes": vertexes,
+        "sidedefs": sidedefs,
+        "linedefs": linedefs,
+        "ssectors": ssectors,
+        "texturedata": texturedata,
+        "player1": player1,
+        "extents": extents
     }
 
-    
+
 if __name__ == "__main__":
-    
+
     de = DoomExporter(iwad, mapname, TextureReader("/home/nicok/Downloads/jsdoom"))
 
-    
     print "----------------------------------------------"
     print " WROTE "
     print "----------------------------------------------"
@@ -163,6 +158,4 @@ if __name__ == "__main__":
     print "%i ssectors" % (len(de.ssectors))
     print "%i sectors" % (len(de.sectors))
     print "%i nodes" % (len(de.nodes))
-    open(outfile,"w").write(de.json)
-
-
+    open(outfile, "w").write(de.json)
